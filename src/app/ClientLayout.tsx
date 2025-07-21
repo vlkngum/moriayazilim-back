@@ -18,7 +18,6 @@ export default function ClientLayout({
         <div className="fixed inset-0 bg-white flex items-center justify-center z-50">
           <div className="flex flex-col items-center">
             <div className="w-16 h-16 border-t-4 border-blue-500 border-solid rounded-full animate-spin"></div>
-            <img src="/images/regedit_blue.png" className="w-48" />
           </div>
         </div>
       )}

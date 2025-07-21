@@ -46,6 +46,7 @@ export default function BlogModal({
   const [blog, setBlog] = useState({
     title: '',
     image: '',
+    desc: '',
     categoryId: '',
     paragraphs: [] as Paragraph[],
   });
@@ -129,7 +130,7 @@ export default function BlogModal({
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             title: blog.title,
-            desc: description,
+            desc: blog.desc,
             image: blog.image,
             categoryId: blog.categoryId,
             paragraphs: blog.paragraphs,
@@ -148,7 +149,7 @@ export default function BlogModal({
         // Create blog
         console.log('Creating new blog with data:', {
           title: blog.title,
-          desc: description,
+          desc: blog.desc,
           image: blog.image,
           categoryId: blog.categoryId,
           paragraphs: blog.paragraphs,
@@ -159,7 +160,7 @@ export default function BlogModal({
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             title: blog.title,
-            desc: description,
+            desc: blog.desc,
             image: blog.image,
             categoryId: blog.categoryId,
             paragraphs: blog.paragraphs,
@@ -168,7 +169,7 @@ export default function BlogModal({
         
         if (res.ok) {
           console.log('Blog created successfully');
-          setBlog({ title: '', image: '', categoryId: '', paragraphs: [] });
+          setBlog({ title: '', image: '',desc:'', categoryId: '', paragraphs: [] });
           onClose(true); // refresh parent
         } else {
           const errorData = await res.json();
@@ -187,11 +188,12 @@ export default function BlogModal({
   // Modal kapandığında formu sıfırla veya edit ise doldur
   React.useEffect(() => {
     if (!isOpen) {
-      setBlog({ title: '', image: '', categoryId: '', paragraphs: [] });
+      setBlog({ title: '', image: '', desc:'', categoryId: '', paragraphs: [] });
     } else if (isEdit && initialBlog) {
       setBlog({
         title: initialBlog.title,
         image: initialBlog.image,
+        desc: initialBlog.desc,
         categoryId: initialBlog.categoryId,
         paragraphs: Array.isArray(initialBlog.paragraphs) ? initialBlog.paragraphs : [],
       });
@@ -247,6 +249,14 @@ export default function BlogModal({
                 initialImageUrl={blog.image}
               />
             </div>
+
+            <input
+              type="text"
+              placeholder="Blog Açıklaması *"
+              value={blog.desc}
+              onChange={e => setBlog(prev => ({ ...prev, desc: e.target.value }))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
             
             {/* Blog Kategorisi */}
             <div className="mb-4">

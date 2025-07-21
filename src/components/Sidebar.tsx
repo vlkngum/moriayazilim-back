@@ -11,13 +11,14 @@ import {
   X
 } from 'lucide-react';
 import { useState } from 'react';
+import Image from 'next/image';
 
 const navigation = [ 
   { 
     name: 'Blog', 
     href: '/blog', 
     icon: BookOpenText ,
-    hasSubsections: true,
+    hasSubsections: false,
     subsections: [
       { name: 'Bloglarımız', href: '/blog',icon: BookOpenText ,  },
       { name: 'Blog Ekle', href: '/blog/add' ,icon: BriefcaseBusiness , },
@@ -28,7 +29,7 @@ const navigation = [
     name: 'Portfolio', 
     href: '/portfolio', 
     icon: BriefcaseBusiness,
-    hasSubsections: true,
+    hasSubsections: false,
     subsections: [
       { name: 'Portfoliolarımız', href: '/portfolio',icon: BookOpenText ,  },
       { name: 'Portfolio Ekle', href: '/portfolio/add',icon: BookOpenText , }
@@ -73,7 +74,13 @@ export default function Sidebar() {
       }`}> 
 
         <div className="flex h-16 items-center justify-center border-b border-blue-900">
-          <img src="/regedit_white.png" alt="logo" className="w-full px-10" />
+          <Image
+            src="/logo_white.png"
+            alt="logo"
+            width={100} 
+            height={100} 
+            className="w-10 h-10"
+          />
         </div>
  
         <div className="h-[calc(100vh-4rem)] overflow-y-auto">

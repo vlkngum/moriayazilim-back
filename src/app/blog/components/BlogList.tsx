@@ -1,5 +1,6 @@
 import React from 'react';
 import { FaEdit, FaTrash } from 'react-icons/fa';
+import Image from 'next/image';
 
 interface Blog {
   id: string;
@@ -35,16 +36,19 @@ const BlogList: React.FC<BlogListProps> = ({ blogs, categories, onEdit, onDelete
         const category = categories.find(cat => cat.id === blog.categoryId);
         return (
           <div key={blog.id} className="bg-white rounded-lg shadow p-4 flex flex-col items-center border border-gray-300 relative group">
-            <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-              <button onClick={() => onEdit && onEdit(blog)} className="p-1 rounded hover:bg-blue-100" title="Düzenle">
-                <FaEdit className="text-blue-700" />
+            <div className="w-full gap-2 opacity-100 transition-opacity pb-2 flex justify-between">
+              <h3 className="text-xl text-gray-800 mb-2">{blog.title}</h3>
+              <div>
+                <button onClick={() => onEdit && onEdit(blog)} className="p-1 rounded bg-blue-100" title="Düzenle">
+                <FaEdit className="text-blue-500 cursor-pointer" />
               </button>
-              <button onClick={() => onDelete && onDelete(blog)} className="p-1 rounded hover:bg-red-100" title="Sil">
-                <FaTrash className="text-red-600" />
+              <button onClick={() => onDelete && onDelete(blog)} className="p-1 rounded bg-red-100" title="Sil">
+                <FaTrash className="text-red-600 cursor-pointer" />
               </button>
+              </div>
             </div>
-            <img src={blog.image} alt={blog.title} className="w-full h-48 object-cover rounded mb-3" />
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">{blog.title}</h3>
+            <Image src={blog.image} alt={blog.title} width={400} height={192} className="w-full min-h-48 max-h-84 object-cover rounded mb-3 border border-gray-300" />
+            
             <div className="flex gap-2 items-center text-xs text-gray-500 mb-2">
               <span>{category ? category.name : 'Kategori Yok'}</span>
               <span>•</span>
