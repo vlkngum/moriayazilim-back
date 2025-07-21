@@ -1,4 +1,4 @@
- 'use client';
+'use client';
 
 import { useEffect } from "react"; 
 import { usePathname, useSearchParams } from 'next/navigation';
@@ -35,7 +35,7 @@ export default function Loading({
     return () => {     
       window.removeEventListener('load', handleLoad);
     };
-  }, []);  
+  }, [setIsLoading]);  
  
   return null;
 }

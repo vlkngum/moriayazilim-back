@@ -25,7 +25,7 @@ interface Blog {
   categoryId: string;
   createdAt: string;
   updatedAt: string;
-  paragraphs?: any;
+  paragraphs?: Paragraph[];
 }
 
 interface BlogModalProps {

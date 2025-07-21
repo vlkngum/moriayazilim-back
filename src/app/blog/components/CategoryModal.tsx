@@ -53,9 +53,13 @@ export default function CategoryModal({
       
       setCategoryName('');
       onClose();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Category save error:', err);
-      toast.error(err.message || 'Kategori kaydedilirken hata oluştu');
+      if (err instanceof Error) {
+        toast.error(err.message || 'Kategori kaydedilirken hata oluştu');
+      } else {
+        toast.error('Kategori kaydedilirken hata oluştu');
+      }
     } finally {
       setIsSaving(false);
     }

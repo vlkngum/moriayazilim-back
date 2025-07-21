@@ -25,7 +25,7 @@ export default function CategoriesPage() {
       } else {
         alert(data.error || "Silme işlemi başarısız.");
       }
-    } catch (error) {
+    } catch {
       alert("Bir hata oluştu.");
     }
   };

@@ -36,7 +36,7 @@ export default function ProductsPage() {
         const res = await fetch('/api/get-blog');
         const data = await res.json();
         setBlogs(data);
-      } catch (error) {
+      } catch {
         setBlogs([]);
       }
     };
@@ -49,7 +49,7 @@ export default function ProductsPage() {
         } else {
           setCategories([]);
         }
-      } catch (error) {
+      } catch {
         setCategories([]);
       }
     };
