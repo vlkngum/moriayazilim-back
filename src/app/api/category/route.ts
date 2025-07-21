@@ -41,11 +41,11 @@ export async function POST(req: NextRequest) {
         }
       }, { status: 201 });
 
-    } catch (dbError: any) {
+    } catch (dbError: unknown) {
       await prisma.$disconnect();
       
       // Unique constraint error (eğer name unique ise)
-      if (dbError.code === 'P2002') {
+      if (typeof dbError === 'object' && dbError !== null && 'code' in dbError && (dbError as { code?: string }).code === 'P2002') {
         return NextResponse.json(
           { error: 'Bu kategori adı zaten mevcut.' },
           { status: 409 }

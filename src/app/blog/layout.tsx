@@ -1,6 +1,5 @@
 "use client";
 
-import React, { useState } from 'react';
 import { usePathname } from 'next/navigation';
 
 export default function RootLayout({
