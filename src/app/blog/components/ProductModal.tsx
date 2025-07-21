@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react';
 import ImageUpload from '@/tools/ImageUpload';
+import Select from 'react-select';
+import { FaChevronDown } from 'react-icons/fa';
 
 interface Category {
   id: string;
@@ -15,16 +17,31 @@ interface Paragraph {
   desc2: string;
 }
 
+interface Blog {
+  id: string;
+  title: string;
+  desc: string;
+  image: string;
+  categoryId: string;
+  createdAt: string;
+  updatedAt: string;
+  paragraphs?: any;
+}
+
 interface BlogModalProps {
   isOpen: boolean;
   onClose: (shouldRefresh?: boolean) => void;
   categories: Category[];
+  initialBlog?: Blog | null;
+  isEdit?: boolean;
 }
 
-export default function ProductModal({ 
+export default function BlogModal({ 
   isOpen, 
   onClose,
-  categories
+  categories,
+  initialBlog = null,
+  isEdit = false
 }: BlogModalProps) {
   const [blog, setBlog] = useState({
     title: '',
@@ -75,47 +92,115 @@ export default function ProductModal({
   };
 
   const handleSave = async () => {
+    // Validation
+    if (!blog.title.trim()) {
+      alert('Blog başlığı zorunludur!');
+      return;
+    }
+    
+    if (!blog.categoryId) {
+      alert('Kategori seçimi zorunludur!');
+      return;
+    }
+
+    if (blog.paragraphs.length === 0) {
+      alert('En az bir paragraf eklemelisiniz!');
+      return;
+    }
+
+    // desc oluştur - paragrafların desc1 kısmından
+    const description = blog.paragraphs
+      .filter(p => p.desc1.trim()) // Boş olmayan desc1'leri al
+      .map(p => p.desc1.trim())
+      .join(' ');
+
+    if (!description) {
+      alert('Paragraf açıklamaları boş olamaz!');
+      return;
+    }
+
     setIsSaving(true);
     try {
-      console.log({
-        title: blog.title,
-        desc: blog.paragraphs.map(p => p.desc1).join(' '),
-        image: blog.image,
-        categoryId: blog.categoryId,
-        paragraphs: blog.paragraphs,
-      });
-      const res = await fetch('/api/blog', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      if (isEdit && initialBlog) {
+        // Update blog
+        console.log('Updating blog with ID:', initialBlog.id);
+        const res = await fetch(`/api/blog?id=${initialBlog.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: blog.title,
+            desc: description,
+            image: blog.image,
+            categoryId: blog.categoryId,
+            paragraphs: blog.paragraphs,
+          })
+        });
+        
+        if (res.ok) {
+          console.log('Blog updated successfully');
+          onClose(true);
+        } else {
+          const errorData = await res.json();
+          console.error('Update error:', errorData);
+          alert('Blog güncellenirken hata oluştu: ' + (errorData.error || 'Bilinmeyen hata'));
+        }
+      } else {
+        // Create blog
+        console.log('Creating new blog with data:', {
           title: blog.title,
-          desc: blog.paragraphs.map(p => p.desc1).join(' '),
+          desc: description,
           image: blog.image,
           categoryId: blog.categoryId,
           paragraphs: blog.paragraphs,
-        })
-      });
-      if (res.ok) {
-        setBlog({ title: '', image: '', categoryId: '', paragraphs: [] });
-        onClose(true); // refresh parent
-      } else {
-        // Hata mesajı gösterilebilir
+        });
+        
+        const res = await fetch('/api/blog', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: blog.title,
+            desc: description,
+            image: blog.image,
+            categoryId: blog.categoryId,
+            paragraphs: blog.paragraphs,
+          })
+        });
+        
+        if (res.ok) {
+          console.log('Blog created successfully');
+          setBlog({ title: '', image: '', categoryId: '', paragraphs: [] });
+          onClose(true); // refresh parent
+        } else {
+          const errorData = await res.json();
+          console.error('Create error:', errorData);
+          alert('Blog eklenirken hata oluştu: ' + (errorData.error || 'Bilinmeyen hata'));
+        }
       }
+    } catch (error) {
+      console.error('Network error:', error);
+      alert('Ağ hatası oluştu. Lütfen tekrar deneyin.');
     } finally {
       setIsSaving(false);
     }
   };
 
-  // Modal kapandığında formu sıfırla
+  // Modal kapandığında formu sıfırla veya edit ise doldur
   React.useEffect(() => {
     if (!isOpen) {
       setBlog({ title: '', image: '', categoryId: '', paragraphs: [] });
+    } else if (isEdit && initialBlog) {
+      setBlog({
+        title: initialBlog.title,
+        image: initialBlog.image,
+        categoryId: initialBlog.categoryId,
+        paragraphs: Array.isArray(initialBlog.paragraphs) ? initialBlog.paragraphs : [],
+      });
     }
-  }, [isOpen]);
+  }, [isOpen, isEdit, initialBlog]);
 
   return (
     <div 
-      className={`fixed inset-0 transition-all duration-300 ease-in-out
+      className={`fixed inset-0 transition-all duration-300 ease-in-out z-50
         ${isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}
       onClick={() => onClose()}
     >
@@ -133,7 +218,7 @@ export default function ProductModal({
         <div className="p-6 h-full flex flex-col">
           <div className="flex justify-between items-center mb-4 flex-shrink-0">
             <h2 className="text-xl font-semibold text-gray-800">
-              Yeni Blog Ekle
+              {isEdit ? 'Blog Düzenle' : 'Yeni Blog Ekle'}
             </h2>
             <button 
               onClick={() => onClose()}
@@ -148,11 +233,12 @@ export default function ProductModal({
             {/* Blog Başlığı */}
             <input
               type="text"
-              placeholder="Blog Başlığı"
+              placeholder="Blog Başlığı *"
               value={blog.title}
               onChange={e => setBlog(prev => ({ ...prev, title: e.target.value }))}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+            
             {/* Blog Fotoğrafı */}
             <div className={`max-h-112 ${blog.image ? "w-1/2" : "w-auto"}`}>
               <ImageUpload
@@ -161,19 +247,25 @@ export default function ProductModal({
                 initialImageUrl={blog.image}
               />
             </div>
+            
             {/* Blog Kategorisi */}
-            <select
-              value={blog.categoryId}
-              onChange={e => setBlog(prev => ({ ...prev, categoryId: e.target.value }))}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Kategori Seçin</option>
-              {categories.map(category => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
+            <div className="mb-4">
+              <Select
+                placeholder="Kategori Seçin *"
+                options={categories.map(category => ({ value: category.id, label: category.name }))}
+                value={categories.find(category => category.id === blog.categoryId) ? 
+                  { value: blog.categoryId, label: categories.find(c => c.id === blog.categoryId)?.name || '' } : null}
+                onChange={opt => setBlog(prev => ({ ...prev, categoryId: opt?.value || '' }))}
+                isSearchable={false}
+                components={{ DropdownIndicator: () => <FaChevronDown className="text-gray-500 mx-2" /> }}
+                styles={{
+                  control: (base) => ({ ...base, borderRadius: 8, borderColor: '#e5e7eb', minHeight: 40 }),
+                  menu: (base) => ({ ...base, zIndex: 20 }),
+                  singleValue: (base) => ({ ...base, color: '#1e293b' }),
+                }}
+              />
+            </div>
+            
             {/* Paragraflar */}
             <div className="space-y-6">
               {blog.paragraphs.map((p, idx) => (
@@ -196,20 +288,19 @@ export default function ProductModal({
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                   <textarea
-                    placeholder="Paragraf Açıklaması 1"
+                    placeholder="Paragraf Açıklaması 1 *"
                     value={p.desc1}
                     onChange={e => handleParagraphChange(idx, 'desc1', e.target.value)}
                     rows={2}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                   
-
                   <div className={`max-h-112 ${p.image ? "w-1/2" : "w-auto"}`}>
-                  <ImageUpload
-                    onImageChange={img => handleParagraphImageChange(idx, img)}
-                    id={`paragraph-image-${idx}`}
-                    initialImageUrl={p.image}
-                  />
+                    <ImageUpload
+                      onImageChange={img => handleParagraphImageChange(idx, img)}
+                      id={`paragraph-image-${idx}`}
+                      initialImageUrl={p.image}
+                    />
                   </div>
                   <textarea
                     placeholder="Paragraf Açıklaması 2"
@@ -239,7 +330,7 @@ export default function ProductModal({
             <button
               onClick={handleSave}
               disabled={isSaving}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-950 hover:bg-blue-900 rounded-md flex items-center gap-2"
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-950 hover:bg-blue-900 rounded-md flex items-center gap-2 disabled:opacity-50"
             >
               {isSaving ? (
                 <>
@@ -250,7 +341,7 @@ export default function ProductModal({
                   Kaydediliyor...
                 </>
               ) : (
-                'Kaydet'
+                isEdit ? 'Güncelle' : 'Kaydet'
               )}
             </button>
           </div>
