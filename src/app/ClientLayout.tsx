@@ -2,8 +2,6 @@
 import { useState, useEffect } from "react";
 import Sidebar from "@/components/Sidebar";
 import Footer from "@/components/Footer"; 
-import Loading from "@/tools/Loading";
-import { Suspense } from 'react';
 import { Toaster } from 'react-hot-toast';
 
 export default function ClientLayout({
@@ -11,7 +9,6 @@ export default function ClientLayout({
 }: {
   children: React.ReactNode;
 }) { 
-  const [isLoading, setIsLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -24,14 +21,6 @@ export default function ClientLayout({
 
   return (
     <> 
-      {isLoading && (
-        <div className="fixed inset-0 bg-white flex items-center justify-center z-50">
-          <div className="flex flex-col items-center">
-            <div className="w-16 h-16 border-t-4 border-blue-500 border-solid rounded-full animate-spin"></div>
-          </div>
-        </div>
-      )}
-
       <div className="flex min-h-screen bg-white">
         <div className="md:pr-64">
           <Sidebar />
@@ -44,10 +33,6 @@ export default function ClientLayout({
           <Footer />
         </div>
       </div>
- 
-      <Suspense fallback={null}>
-        <Loading setIsLoading={setIsLoading} />
-      </Suspense>
 
       <Toaster 
         position="top-right"
