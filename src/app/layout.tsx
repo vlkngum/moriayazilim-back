@@ -4,6 +4,7 @@ import { poppins } from "@/app/ui/fonts";
  
 
 import ClientLayoutWrapper from "./ClientLayout";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 import type { Metadata } from "next";
 
@@ -21,7 +22,9 @@ export default function RootLayout({
   return (
     <html>
       <body className={`${poppins.className} antialiased bg-white text-black`}>
-        <ClientLayoutWrapper>{children}</ClientLayoutWrapper>
+        <AuthProvider>
+          <ClientLayoutWrapper>{children}</ClientLayoutWrapper>
+        </AuthProvider>
       </body>
     </html>
   );

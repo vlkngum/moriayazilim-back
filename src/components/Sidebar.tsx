@@ -5,35 +5,43 @@ import { usePathname } from 'next/navigation';
 import { 
   BookOpenText ,  
   BriefcaseBusiness ,  
-  ChevronDown, 
-  ChevronRight,
   Menu,
-  X
+  X,
+  LogOut,
+  User,
+  UserPlus 
 } from 'lucide-react';
 import { useState } from 'react';
 import Image from 'next/image';
+import { useAuth } from '@/contexts/AuthContext';
 
 const navigation = [ 
   { 
+    name: 'User Control', 
+    href: '/user-control', 
+    icon: UserPlus,
+    hasSubsections: false,
+    subsections: [],
+    showForStatic: true,
+    showForDatabase: false
+  },
+  { 
     name: 'Blog', 
     href: '/blog', 
-    icon: BookOpenText ,
+    icon: BookOpenText,
     hasSubsections: false,
-    subsections: [
-      { name: 'Bloglarımız', href: '/blog',icon: BookOpenText ,  },
-      { name: 'Blog Ekle', href: '/blog/add' ,icon: BriefcaseBusiness , },
-      { name: 'Blog Kategorisi Ekle', href: '/blog/add/category' ,icon: BookOpenText , }
-    ]
+    subsections: [],
+    showForStatic: false,
+    showForDatabase: true
   },
   { 
     name: 'Portfolio', 
     href: '/portfolio', 
     icon: BriefcaseBusiness,
     hasSubsections: false,
-    subsections: [
-      { name: 'Portfoliolarımız', href: '/portfolio',icon: BookOpenText ,  },
-      { name: 'Portfolio Ekle', href: '/portfolio/add',icon: BookOpenText , }
-    ]
+    subsections: [],
+    showForStatic: false,
+    showForDatabase: true
   },
   
 ];
@@ -41,15 +49,22 @@ const navigation = [
 export default function Sidebar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
-  const [expandedItems, setExpandedItems] = useState<string[]>([]);
+  const { currentUser, userType, logout } = useAuth();
 
-  const toggleSubsection = (itemName: string) => {
-    setExpandedItems(prev => 
-      prev.includes(itemName) 
-        ? prev.filter(name => name !== itemName)
-        : [...prev, itemName]
-    );
+  const handleLogout = () => {
+    logout();
+    setIsOpen(false);
   };
+
+  // Kullanıcı tipine göre menü öğelerini filtrele
+  const filteredNavigation = navigation.filter(item => {
+    if (userType === 'static') {
+      return item.showForStatic;
+    } else if (userType === 'database') {
+      return item.showForDatabase;
+    }
+    return false;
+  });
 
   return (
     <>
@@ -73,7 +88,7 @@ export default function Sidebar() {
         isOpen ? 'translate-x-0' : '-translate-x-full'
       }`}> 
 
-        <div className="flex h-16 items-center justify-center border-b border-blue-900">
+        <div className="flex py-4 items-center justify-center border-b border-blue-900">
           <Image
             src="/logo_white.png"
             alt="logo"
@@ -82,13 +97,22 @@ export default function Sidebar() {
             className="w-10 h-10"
           />
         </div>
+
+        {/* Kullanıcı Bilgisi */}
+        <div className="p-4 border-b border-blue-900">
+          <div className="flex items-center space-x-2">
+            <User className="h-5 w-5 text-gray-400" />
+            <span className="text-sm text-gray-300">
+              {currentUser || 'Kullanıcı'}
+            </span>
+          </div>
+        </div>
  
-        <div className="h-[calc(100vh-4rem)] overflow-y-auto">
+        <div className="h-[calc(100vh-8rem)] overflow-y-auto">
           <nav className="space-y-1 p-2">
-            {navigation.map((item) => {
+            {filteredNavigation.map((item) => {
               const isActive = pathname === item.href || 
-                            (item.subsections?.some(sub => pathname === sub.href));
-              const isExpanded = expandedItems.includes(item.name);
+                            (item.subsections?.some((sub: { href: string }) => pathname === sub.href));
 
               const itemContent = (
                 <>
@@ -99,70 +123,38 @@ export default function Sidebar() {
                     aria-hidden="true"
                   />
                   <span className="flex-1">{item.name}</span>
-                  {item.hasSubsections && (
-                    isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />
-                  )}
                 </>
               );
 
               return (
                 <div key={item.name}>
-                  {item.hasSubsections ? (
+                  <Link
+                    href={item.href}
+                    onClick={() => setIsOpen(false)}
+                    className={`group flex items-center rounded-md px-2 py-2 transition-all duration-200 text-sm ${
+                      isActive
+                        ? 'bg-black/40 text-white backdrop-blur-xl'
+                        : 'text-gray-300 hover:bg-black/30 hover:text-white hover:backdrop-blur-xl'
+                    }`}
+                  >
                     
-                    <div
-                      onClick={() => toggleSubsection(item.name)}
-                      className={`group flex items-center rounded-md px-2 py-2 transition-all duration-200 text-sm cursor-pointer ${
-                        isActive
-                          ? 'bg-black/40 text-white backdrop-blur-xl'
-                          : 'text-gray-300 hover:bg-black/30 hover:text-white hover:backdrop-blur-xl'
-                      }`}
-                    >
-                      
-                      {itemContent}
-                    </div>
-                  ) : (
-                    <Link
-                      href={item.href}
-                      onClick={() => setIsOpen(false)}
-                      className={`group flex items-center rounded-md px-2 py-2 transition-all duration-200 text-sm ${
-                        isActive
-                          ? 'bg-black/40 text-white backdrop-blur-xl'
-                          : 'text-gray-300 hover:bg-black/30 hover:text-white hover:backdrop-blur-xl'
-                      }`}
-                    >
-                      
-                      {itemContent}
-                    </Link>
-                  )}
-                  
-                  {item.hasSubsections && isExpanded && item.subsections && (
-                    <div className="ml-6 mt-1 space-y-1">
-                      {item.subsections.map((subsection) => (
-                        <Link
-                          key={subsection.href}
-                          href={subsection.href}
-                          onClick={() => setIsOpen(false)}
-                          className={` rounded-md px-2 py-2 text-sm transition-all duration-200 flex flex-row ${
-                            pathname === subsection.href
-                              ? 'bg-black/40 text-white backdrop-blur-xl'
-                              : 'text-gray-300 hover:bg-black/30 hover:text-white hover:backdrop-blur-xl'
-                          }`}
-                        >
-                          <subsection.icon
-                            className={`mr-3 h-5 w-5 flex-shrink-0 transition-colors duration-200 ${
-                              isActive ? 'text-white' : 'text-gray-400 group-hover:text-white'
-                            }`}
-                            aria-hidden="true"
-                          />
-                          {subsection.name}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
+                    {itemContent}
+                  </Link> 
                 </div>
               );
             })}
           </nav>
+        </div>
+
+        {/* Logout Butonu */}
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-blue-900">
+          <button
+            onClick={handleLogout}
+            className="flex items-center w-full px-2 py-2 text-sm text-gray-300 hover:bg-black/30 hover:text-white transition-all duration-200 rounded-md"
+          >
+            <LogOut className="mr-3 h-5 w-5" />
+            Çıkış Yap
+          </button>
         </div>
       </aside>
     </>

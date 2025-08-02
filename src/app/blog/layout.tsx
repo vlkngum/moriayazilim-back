@@ -1,5 +1,7 @@
 "use client";
 
+
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 export default function RootLayout({
@@ -39,7 +41,7 @@ export default function RootLayout({
                           (page.href === '/products' && pathname === '/products') ||
                           (page.href === '/products/category' && pathname === '/products/category');
                         return (
-                          <a
+                          <Link
                             key={index}
                             href={page.href}
                             className={`px-2 py-2 text-md font-medium transition-colors duration-500
@@ -49,7 +51,7 @@ export default function RootLayout({
                               }`}
                           >
                             {page.text}
-                          </a>
+                          </Link>
                         );
                       })}
                     </div>
