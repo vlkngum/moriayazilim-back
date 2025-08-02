@@ -102,3 +102,64 @@ export async function GET() {
     );
   }
 }
+
+// DELETE endpoint - kategori sil
+export async function DELETE(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json(
+        { error: 'Kategori ID gerekli.' },
+        { status: 400 }
+      );
+    }
+
+    const { PrismaClient } = await import('@prisma/client');
+    const prisma = new PrismaClient();
+
+    try {
+      // Check if category exists
+      const existingCategory = await prisma.category.findUnique({
+        where: { id }
+      });
+
+      if (!existingCategory) {
+        await prisma.$disconnect();
+        return NextResponse.json(
+          { error: 'Kategori bulunamadı.' },
+          { status: 404 }
+        );
+      }
+
+      // Delete the category
+      await prisma.category.delete({
+        where: { id }
+      });
+
+      await prisma.$disconnect();
+
+      return NextResponse.json({ 
+        success: true,
+        message: 'Kategori başarıyla silindi.'
+      });
+
+    } catch (dbError: unknown) {
+      await prisma.$disconnect();
+      
+      console.error('Database error:', dbError);
+      return NextResponse.json(
+        { error: 'Kategori silinirken bir hata oluştu.' },
+        { status: 500 }
+      );
+    }
+
+  } catch (error) {
+    console.error('Category deletion error:', error);
+    return NextResponse.json(
+      { error: 'Kategori silinirken bir hata oluştu.' },
+      { status: 500 }
+    );
+  }
+}

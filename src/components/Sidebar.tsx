@@ -21,8 +21,7 @@ const navigation = [
     hasSubsections: false,
     subsections: [
       { name: 'Bloglarımız', href: '/blog',icon: BookOpenText ,  },
-      { name: 'Blog Ekle', href: '/blog/add' ,icon: BriefcaseBusiness , },
-      { name: 'Blog Kategorisi Ekle', href: '/blog/add/category' ,icon: BookOpenText , }
+      { name: 'Blog Kategorisi Ekle', href: '/blog/category' ,icon: BookOpenText , }
     ]
   },
   { 
@@ -32,7 +31,6 @@ const navigation = [
     hasSubsections: false,
     subsections: [
       { name: 'Portfoliolarımız', href: '/portfolio',icon: BookOpenText ,  },
-      { name: 'Portfolio Ekle', href: '/portfolio/add',icon: BookOpenText , }
     ]
   },
   
@@ -74,13 +72,15 @@ export default function Sidebar() {
       }`}> 
 
         <div className="flex h-16 items-center justify-center border-b border-blue-900">
-          <Image
-            src="/logo_white.png"
-            alt="logo"
-            width={100} 
-            height={100} 
-            className="w-10 h-10"
-          />
+          <Link href="/">
+            <Image
+              src="/logo_white.png"
+              alt="logo"
+              width={100} 
+              height={100} 
+              className="w-10 h-10"
+            />
+          </Link>
         </div>
  
         <div className="h-[calc(100vh-4rem)] overflow-y-auto">

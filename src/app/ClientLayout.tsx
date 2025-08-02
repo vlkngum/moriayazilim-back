@@ -1,9 +1,10 @@
 'use client' 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Sidebar from "@/components/Sidebar";
 import Footer from "@/components/Footer"; 
 import Loading from "@/tools/Loading";
 import { Suspense } from 'react';
+import { Toaster } from 'react-hot-toast';
 
 export default function ClientLayout({
   children,
@@ -11,6 +12,15 @@ export default function ClientLayout({
   children: React.ReactNode;
 }) { 
   const [isLoading, setIsLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <> 
@@ -38,6 +48,31 @@ export default function ClientLayout({
       <Suspense fallback={null}>
         <Loading setIsLoading={setIsLoading} />
       </Suspense>
+
+      <Toaster 
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: '#363636',
+            color: '#fff',
+          },
+          success: {
+            duration: 3000,
+            iconTheme: {
+              primary: '#4ade80',
+              secondary: '#fff',
+            },
+          },
+          error: {
+            duration: 4000,
+            iconTheme: {
+              primary: '#ef4444',
+              secondary: '#fff',
+            },
+          },
+        }}
+      />
     </> 
   );
 }
