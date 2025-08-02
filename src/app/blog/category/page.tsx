@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 import CategoryModal from "../components/CategoryModal";
 
 type Category = {
@@ -13,6 +15,9 @@ export default function CategoriesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  const router = useRouter();
+  const { isLoggedIn, userType } = useAuth();
 
   // Kategori silme fonksiyonu
   const handleDeleteCategory = async (categoryId: string) => {
@@ -49,8 +54,20 @@ export default function CategoriesPage() {
   };
 
   useEffect(() => {
+    // Kullanıcı giriş yapmamışsa login sayfasına yönlendir
+    if (!isLoggedIn) {
+      router.push('/login');
+      return;
+    }
+
+    // Static kullanıcılar blog kategorileri sayfasına erişemez
+    if (userType === 'static') {
+      router.push('/');
+      return;
+    }
+
     fetchCategories();
-  }, []);
+  }, [isLoggedIn, userType, router]);
 
   return (
     <div className="p-6 space-y-6">

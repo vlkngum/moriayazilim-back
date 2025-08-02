@@ -16,7 +16,6 @@ export default function LoginPage() {
   const { login, isLoggedIn } = useAuth();
 
   useEffect(() => {
-    // Sayfa yüklendiğinde zaten giriş yapılmış mı kontrol et
     if (isLoggedIn) {
       router.push('/');
     }

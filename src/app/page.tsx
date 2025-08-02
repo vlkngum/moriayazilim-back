@@ -1,11 +1,22 @@
 'use client'
 
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { Shield, Database, UserPlus, BookOpenText, BriefcaseBusiness } from 'lucide-react';
 import Link from 'next/link';
 
 export default function Home() {
-  const { currentUser, userType } = useAuth();
+  const { currentUser, userType, isLoggedIn } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    // Kullanıcı giriş yapmamışsa login sayfasına yönlendir
+    if (!isLoggedIn) {
+      router.push('/login');
+      return;
+    }
+  }, [isLoggedIn, router]);
 
   const getUserTypeIcon = () => {
     if (userType === 'static') {

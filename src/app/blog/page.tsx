@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 import ProductModal from './components/ProductModal';
 import BlogList from './components/BlogList';
 import Select from 'react-select';
@@ -29,8 +31,23 @@ export default function ProductsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [sortBy, setSortBy] = useState<'createdAt' | 'title'>('createdAt');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  
+  const router = useRouter();
+  const { isLoggedIn, userType } = useAuth();
 
   useEffect(() => {
+    // Kullanıcı giriş yapmamışsa login sayfasına yönlendir
+    if (!isLoggedIn) {
+      router.push('/login');
+      return;
+    }
+
+    // Static kullanıcılar blog sayfasına erişemez
+    if (userType === 'static') {
+      router.push('/');
+      return;
+    }
+
     const fetchBlogs = async () => {
       try {
         const res = await fetch('/api/get-blog');
@@ -55,7 +72,7 @@ export default function ProductsPage() {
     };
     fetchBlogs();
     fetchCategories();
-  }, []);
+  }, [isLoggedIn, userType, router]);
 
   // Modal kapandığında blog eklenmişse veya güncellendiyse tekrar fetch et
   const handleModalClose = (shouldRefresh = false) => {

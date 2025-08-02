@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 import { Plus } from 'lucide-react';
 import AddUserModal from '@/components/AddUserModal';
 
@@ -14,10 +16,25 @@ export default function UserControlPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
+  
+  const router = useRouter();
+  const { isLoggedIn, userType } = useAuth();
 
   useEffect(() => {
+    // Kullanıcı giriş yapmamışsa login sayfasına yönlendir
+    if (!isLoggedIn) {
+      router.push('/login');
+      return;
+    }
+
+    // Database kullanıcılar user-control sayfasına erişemez
+    if (userType === 'database') {
+      router.push('/');
+      return;
+    }
+
     fetchUsers();
-  }, []);
+  }, [isLoggedIn, userType, router]);
 
   const fetchUsers = async () => {
     try {

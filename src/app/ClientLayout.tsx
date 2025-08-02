@@ -9,13 +9,22 @@ import { Toaster } from 'react-hot-toast';
 // Sidebar ve Footer gizlenecek sayfalar
 const hiddenLayoutPages = ['/login', '/register'];
 
+// Sayfa erişim kuralları
+const pageAccessRules = {
+  '/user-control': ['static'],
+  '/blog': ['database'],
+  '/blog/category': ['database'],
+  '/portfolio': ['database'],
+  '/': ['static', 'database']
+};
+
 export default function ClientLayout({
   children,
 }: {
   children: React.ReactNode;
 }) { 
   const [isMounted, setIsMounted] = useState(false);
-  const { isLoggedIn, checkAuth } = useAuth();
+  const { isLoggedIn, checkAuth, userType } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
 
@@ -35,6 +44,12 @@ export default function ClientLayout({
         // Eğer giriş yapılmamışsa ve login sayfasında değilse, login'e yönlendir
         if (!isAuthenticated && !hiddenLayoutPages.includes(pathname)) {
           router.push('/login');
+          return;
+        }
+
+        // Sayfa erişim kontrolü
+        if (isAuthenticated && userType) {
+          checkPageAccess();
         }
       } catch (error) {
         console.error('Auth initialization error:', error);
@@ -42,7 +57,24 @@ export default function ClientLayout({
     };
 
     initializeAuth();
-  }, [isMounted, checkAuth, pathname, router]);
+  }, [isMounted, checkAuth, pathname, router, userType]);
+
+  // Sayfa erişim kontrolü fonksiyonu
+  const checkPageAccess = () => {
+    // Ana sayfa her zaman erişilebilir
+    if (pathname === '/') return;
+
+    const allowedUserTypes = pageAccessRules[pathname as keyof typeof pageAccessRules];
+    
+    // Eğer sayfa için kural yoksa erişime izin ver
+    if (!allowedUserTypes) return;
+
+    // Kullanıcı türü bu sayfaya erişemiyorsa ana sayfaya yönlendir
+    if (!allowedUserTypes.includes(userType as string)) {
+      router.push('/');
+      return;
+    }
+  };
 
   // Mount tamamlanana kadar server ile aynı durumu render et
   if (!isMounted) {
