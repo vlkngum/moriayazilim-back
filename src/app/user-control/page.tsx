@@ -80,7 +80,7 @@ export default function UserControlPage() {
         <h1 className="text-3xl font-bold text-gray-900">Kullanıcı Yönetimi</h1>
         <button
           onClick={() => setShowAddForm(true)}
-          className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-nowrap md:text-md text-sm"
+          className="flex items-center px-4 py-2 bg-blue-900 text-white rounded-md cursor-pointer transition-colors text-nowrap md:text-md text-sm"
         >
           <Plus className="w-4 h-4 mr-2" />
            Kullanıcı Ekle
@@ -90,7 +90,7 @@ export default function UserControlPage() {
       {/* Kullanıcı Listesi */}
       <div className="bg-white rounded-lg shadow-md">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">Veritabanı Kullanıcıları</h2>
+          <h2 className="text-lg text-gray-900">Veritabanı Kullanıcıları</h2>
         </div>
         
         {isLoading ? (

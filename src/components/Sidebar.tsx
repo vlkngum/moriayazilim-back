@@ -68,7 +68,6 @@ export default function Sidebar() {
 
   return (
     <>
-       
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="fixed left-4 top-4 z-50 rounded-md bg-blue-950 p-2 text-white backdrop-blur-md lg:hidden"
@@ -89,13 +88,15 @@ export default function Sidebar() {
       }`}> 
 
         <div className="flex py-4 items-center justify-center border-b border-blue-900">
-          <Image
-            src="/logo_white.png"
-            alt="logo"
-            width={100} 
-            height={100} 
-            className="w-10 h-10"
-          />
+          <Link href={"/"}>
+            <Image
+              src="/logo_white.png"
+              alt="logo"
+              width={100} 
+              height={100} 
+              className="w-10 h-10"
+            />
+          </Link>
         </div>
 
         {/* Kullanıcı Bilgisi */}
