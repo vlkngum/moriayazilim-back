@@ -4,6 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import Footer from "@/components/Footer"; 
 import { useAuth } from "@/contexts/AuthContext";
+import { Toaster } from 'react-hot-toast';
 
 // Sidebar ve Footer gizlenecek sayfalar
 const hiddenLayoutPages = ['/login', '/register'];
@@ -64,6 +65,30 @@ export default function ClientLayout({
         <main className="bg-white text-black">
           {children}
         </main>
+        <Toaster 
+          position="top-right"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: '#363636',
+              color: '#fff',
+            },
+            success: {
+              duration: 3000,
+              iconTheme: {
+                primary: '#4ade80',
+                secondary: '#fff',
+              },
+            },
+            error: {
+              duration: 4000,
+              iconTheme: {
+                primary: '#ef4444',
+                secondary: '#fff',
+              },
+            },
+          }}
+        />
       </div>
     );
   }
@@ -82,20 +107,47 @@ export default function ClientLayout({
 
   // Normal layout - sidebar ve footer ile
   return (
-    <div className="flex min-h-screen bg-white">
-      {/* Sidebar - login yapmış kullanıcılar için */}
-      {isLoggedIn && (
-        <div className="md:pr-64">
-          <Sidebar />
+    <>
+      <div className="flex min-h-screen bg-white">
+        {/* Sidebar - login yapmış kullanıcılar için */}
+        {isLoggedIn && (
+          <div className="md:pr-64">
+            <Sidebar />
+          </div>
+        )}
+        
+        <div className="flex-1 flex flex-col min-h-screen">
+          <main className="flex-1 bg-white p-4 lg:p-8 pt-5 text-black">
+            {children}
+          </main>
+          <Footer />
         </div>
-      )}
-      
-      <div className="flex-1 flex flex-col min-h-screen">
-        <main className="flex-1 bg-white p-4 lg:p-8 pt-5 text-black">
-          {children}
-        </main>
-        <Footer />
       </div>
-    </div>
+
+      <Toaster 
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: '#363636',
+            color: '#fff',
+          },
+          success: {
+            duration: 3000,
+            iconTheme: {
+              primary: '#4ade80',
+              secondary: '#fff',
+            },
+          },
+          error: {
+            duration: 4000,
+            iconTheme: {
+              primary: '#ef4444',
+              secondary: '#fff',
+            },
+          },
+        }}
+      />
+    </>
   );
 }

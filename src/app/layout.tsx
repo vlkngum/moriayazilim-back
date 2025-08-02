@@ -11,7 +11,6 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Moria Back",
   description: "Moria Back HomePage",
-  icons: "/regedit_logo.ico",  
 };
 
 export default function RootLayout({
@@ -20,7 +19,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html>
+    <html lang="tr">
       <body className={`${poppins.className} antialiased bg-white text-black`}>
         <AuthProvider>
           <ClientLayoutWrapper>{children}</ClientLayoutWrapper>

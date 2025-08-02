@@ -70,6 +70,7 @@ export default function CategoriesPage() {
         onCategoryCreated={(category) => {
           console.log("Yeni kategori:", category);
           setIsModalOpen(false);
+          fetchCategories(); // Kategorileri yeniden yükle
         }}
       />
 
