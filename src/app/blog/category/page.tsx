@@ -60,24 +60,19 @@ export default function CategoriesPage() {
       return;
     }
 
-    // Static kullanıcılar blog kategorileri sayfasına erişemez
-    if (userType === 'static') {
-      router.push('/');
-      return;
-    }
 
     fetchCategories();
   }, [isLoggedIn, userType, router]);
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="py-6 px-2 space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl  text-gray-800">Kategoriler</h2>
+        <h2 className="text-4xl font-bold text-gray-800">Kategori</h2>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="px-4 py-2 bg-blue-950 text-white rounded-md hover:bg-blue-900 transition-colors"
+          className="px-4 py-2 bg-blue-950 text-white rounded-md hover:bg-blue-900 transition-colors md:text-md  text-nowrap"
         >
-          Yeni Kategori Ekle
+          Kategoriler Ekle
         </button>
       </div>
 

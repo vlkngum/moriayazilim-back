@@ -76,14 +76,14 @@ export default function UserControlPage() {
 
   return (
     <div className="max-w-6xl mx-auto p-6">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center my-6">
         <h1 className="text-3xl font-bold text-gray-900">Kullanıcı Yönetimi</h1>
         <button
           onClick={() => setShowAddForm(true)}
-          className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+          className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-nowrap md:text-md text-sm"
         >
           <Plus className="w-4 h-4 mr-2" />
-          Yeni Kullanıcı Ekle
+           Kullanıcı Ekle
         </button>
       </div>
 

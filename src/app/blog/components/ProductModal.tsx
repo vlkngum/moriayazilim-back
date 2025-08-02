@@ -202,7 +202,7 @@ export default function BlogModal({
 
   return (
     <div 
-      className={`fixed inset-0 transition-all duration-300 ease-in-out z-50
+      className={`fixed inset-0 transition-all duration-300 ease-in-out z-50 h-full
         ${isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}
       onClick={() => onClose()}
     >
@@ -212,15 +212,14 @@ export default function BlogModal({
       />
       
       <div 
-        className={`fixed right-0 top-0 h-full w-1/3 bg-white shadow-lg
-          transform transition-all duration-300 ease-in-out
+        className={`fixed right-0 top-0 h-full md:w-1/3 w-full md:bg-white bg-white/95 shadow-lgtransform transition-all duration-300 ease-in-out
           ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
         onClick={e => e.stopPropagation()}
       >
         <div className="p-6 h-full flex flex-col">
           <div className="flex justify-between items-center mb-4 flex-shrink-0">
             <h2 className="text-xl font-semibold text-gray-800">
-              {isEdit ? 'Blog Düzenle' : 'Yeni Blog Ekle'}
+              {isEdit ? 'Blog Düzenle' : 'Blog Ekle'}
             </h2>
             <button 
               onClick={() => onClose()}

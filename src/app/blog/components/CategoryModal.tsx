@@ -72,23 +72,20 @@ export default function CategoryModal({
   };
 
   return (
-    <div
-      className={`fixed inset-0 transition-all duration-300 ease-in-out z-50 ${
-        isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
-      }`}
-      onClick={onClose}
+    <div 
+      className={`fixed inset-0 transition-all duration-300 ease-in-out z-50 h-full
+        ${isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}
+      onClick={() => onClose()}
     >
-      <div
-        className={`absolute inset-0 bg-black/30 transition-opacity duration-300 ${
-          isOpen ? 'opacity-100' : 'opacity-0'
-        }`}
+      <div 
+        className={`absolute inset-0 bg-black/30 transition-opacity duration-300
+          ${isOpen ? 'opacity-100' : 'opacity-0'}`}
       />
 
-      <div
-        className={`fixed right-0 top-0 h-full w-screen md:w-1/5 bg-white shadow-lg transform transition-all duration-300 ease-in-out ${
-          isOpen ? 'translate-x-0' : 'translate-x-full'
-        }`}
-        onClick={(e) => e.stopPropagation()}
+      <div 
+        className={`fixed right-0 top-0 h-full md:w-1/4 w-full md:bg-white bg-white/95 shadow-lgtransform transition-all duration-300 ease-in-out
+          ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
+        onClick={e => e.stopPropagation()}
       >
         <div className="p-6">
           <div className="flex justify-between items-center mb-4">
@@ -129,8 +126,8 @@ export default function CategoryModal({
                 disabled={isSaving || !categoryName.trim()}
                 className={`px-4 py-2 text-sm font-medium text-white rounded-md transition-all hover:scale-105 disabled:cursor-not-allowed disabled:hover:scale-100 ${
                   isSaving || !categoryName.trim() 
-                    ? 'bg-blue-300 cursor-not-allowed' 
-                    : 'bg-blue-950 hover:bg-blue-900'
+                    ? 'bg-blue-950 cursor-not-allowed' 
+                    : 'bg-blue-900 hover:bg-blue-950'
                 }`}
               >
                 {isSaving ? 'Kaydediliyor...' : 'Kaydet'}

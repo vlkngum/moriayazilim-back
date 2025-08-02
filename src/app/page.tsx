@@ -53,7 +53,7 @@ export default function Home() {
           description: 'Veritabanı kullanıcılarını ekleyin, düzenleyin ve silin.',
           icon: UserPlus,
           href: '/user-control',
-          color: 'bg-blue-600 hover:bg-blue-700'
+          color: 'bg-blue-900 hover:bg-blue-950'
         }
       ];
     } else if (userType === 'database') {
@@ -63,14 +63,14 @@ export default function Home() {
           description: 'Blog yazılarınızı yönetin, yeni blog ekleyin ve kategoriler oluşturun.',
           icon: BookOpenText,
           href: '/blog',
-          color: 'bg-blue-600 hover:bg-blue-700'
+          color: 'bg-blue-900 hover:bg-blue-800'
         },
         {
           title: 'Portfolio Yönetimi',
           description: 'Portfolio projelerinizi yönetin ve yeni projeler ekleyin.',
           icon: BriefcaseBusiness,
           href: '/portfolio',
-          color: 'bg-green-600 hover:bg-green-700'
+          color: 'bg-green-700 hover:bg-green-600'
         }
       ];
     }
@@ -109,7 +109,7 @@ export default function Home() {
               </p>
               <Link 
                 href={card.href}
-                className={`inline-block text-white px-4 py-2 rounded-md transition-colors ${card.color}`}
+                className={`inline-block text-white px-4 py-2 rounded-md transition-all durations-300 ${card.color}`}
               >
                 {card.title} Git
               </Link>

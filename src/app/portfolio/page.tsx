@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 
 export default function Page() {
   const router = useRouter();
-  const { isLoggedIn, userType } = useAuth();
+  const { isLoggedIn } = useAuth();
 
   useEffect(() => {
     // Kullanıcı giriş yapmamışsa login sayfasına yönlendir
@@ -15,12 +15,7 @@ export default function Page() {
       return;
     }
 
-    // Static kullanıcılar portfolio sayfasına erişemez
-    if (userType === 'static') {
-      router.push('/');
-      return;
-    }
-  }, [isLoggedIn, userType, router]);
+  }, [isLoggedIn, router]);
 
   return <div>Portfolio Sayfası</div>;
 }

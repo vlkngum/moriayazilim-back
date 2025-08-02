@@ -33,7 +33,7 @@ export default function ProductsPage() {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   
   const router = useRouter();
-  const { isLoggedIn, userType } = useAuth();
+  const { isLoggedIn } = useAuth();
 
   useEffect(() => {
     // Kullanıcı giriş yapmamışsa login sayfasına yönlendir
@@ -42,11 +42,7 @@ export default function ProductsPage() {
       return;
     }
 
-    // Static kullanıcılar blog sayfasına erişemez
-    if (userType === 'static') {
-      router.push('/');
-      return;
-    }
+    
 
     const fetchBlogs = async () => {
       try {
@@ -72,7 +68,7 @@ export default function ProductsPage() {
     };
     fetchBlogs();
     fetchCategories();
-  }, [isLoggedIn, userType, router]);
+  }, [isLoggedIn, router]);
 
   // Modal kapandığında blog eklenmişse veya güncellendiyse tekrar fetch et
   const handleModalClose = (shouldRefresh = false) => {
@@ -140,14 +136,14 @@ export default function ProductsPage() {
   ];
 
   return (
-    <div className="space-y-6 p-4">
+    <div className="space-y-6 py-6 px-2">
       <div className="flex justify-between items-center">
-        <h2 className="text-4xl text-gray-800">Ürünler</h2>
+        <h2 className="text-4xl font-bold text-gray-800">Bloglar</h2>
         <button
           onClick={() => setIsModalOpen(true)}
           className="px-4 py-2 bg-blue-950 text-white rounded-md hover:bg-blue-900 transition-colors"
         >
-          Yeni Ürün Ekle
+          Blog Ekle
         </button>
       </div>
 
