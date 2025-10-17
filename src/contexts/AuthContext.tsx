@@ -20,6 +20,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [userType, setUserType] = useState<'static' | 'database' | null>(null);
   const router = useRouter();
 
+  // --- FIX STARTS HERE ---
+
+  // Step 1: Wrap logout in useCallback to stabilize it.
+  const logout = useCallback(() => {
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('userType');
+    localStorage.removeItem('loginExpires');
+    
+    setIsLoggedIn(false);
+    setCurrentUser(null);
+    setUserType(null);
+    
+    router.push('/login');
+  }, [router]); // Its only dependency is the router.
+
+  // Step 2: Add the now-stable `logout` function to checkAuth's dependency array.
   const checkAuth = useCallback((): boolean => {
     if (typeof window === 'undefined') return false;
 
@@ -38,14 +55,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUserType(storedUserType as 'static' | 'database' | null);
         return true;
       } else {
-        // Session süresi dolmuş
+        // Session has expired, call logout.
         logout();
         return false;
       }
     }
 
     return false;
-  }, []);
+  }, [logout]); // ✅ Correctly added 'logout' as a dependency.
+
+  // --- FIX ENDS HERE ---
 
   useEffect(() => {
     checkAuth();
@@ -85,19 +104,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('currentUser');
-    localStorage.removeItem('userType');
-    localStorage.removeItem('loginExpires');
-    
-    setIsLoggedIn(false);
-    setCurrentUser(null);
-    setUserType(null);
-    
-    router.push('/login');
-  };
-
   return (
     <AuthContext.Provider value={{ isLoggedIn, currentUser, userType, login, logout, checkAuth }}>
       {children}
@@ -111,4 +117,4 @@ export function useAuth() {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-} 
+}
