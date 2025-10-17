@@ -52,7 +52,7 @@ export default function UserControlPage() {
 
   const handleAddUser = async (userData: { username: string; password: string }) => {
     try {
-      const response = await fetch('/api/users/register', {
+      const response = await fetch('/api/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(userData),

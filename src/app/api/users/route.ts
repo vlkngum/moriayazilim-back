@@ -38,9 +38,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Basit doğrulamalar
+    if (typeof username !== 'string' || typeof password !== 'string') {
+      return NextResponse.json(
+        { error: 'Geçersiz veri tipi' },
+        { status: 400 }
+      );
+    }
+
+    const trimmedUsername = username.trim();
+    const trimmedPassword = password.trim();
+
+    if (!trimmedUsername || !trimmedPassword) {
+      return NextResponse.json(
+        { error: 'Kullanıcı adı ve şifre boş olamaz' },
+        { status: 400 }
+      );
+    }
+
     // Kullanıcı adının benzersiz olup olmadığını kontrol et
     const existingUser = await prisma.user.findUnique({
-      where: { username }
+      where: { username: trimmedUsername }
     });
 
     if (existingUser) {
@@ -53,8 +71,8 @@ export async function POST(request: NextRequest) {
     // Yeni kullanıcı oluştur
     const newUser = await prisma.user.create({
       data: {
-        username,
-        password
+        username: trimmedUsername,
+        password: trimmedPassword
       },
       select: {
         id: true,
@@ -70,8 +88,9 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Kullanıcı eklenirken hata:', error);
+    const message = error instanceof Error ? error.message : 'Kullanıcı eklenemedi';
     return NextResponse.json(
-      { error: 'Kullanıcı eklenemedi' },
+      { error: process.env.NODE_ENV === 'development' ? message : 'Kullanıcı eklenemedi' },
       { status: 500 }
     );
   }
