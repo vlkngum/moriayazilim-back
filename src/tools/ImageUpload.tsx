@@ -77,6 +77,7 @@ export default function ImageUpload({ onImageChange, id, initialImageUrl }: Imag
         {previewUrl ? (
           <div className="relative w-full h-full">
             <Image
+              unoptimized={previewUrl.startsWith('data:')}
               src={previewUrl}
               alt="Preview"
               width={400} // Gerekirse uygun bir değerle değiştir

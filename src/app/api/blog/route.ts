@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
+import { put } from '@vercel/blob';
 
 // Blog ekle (POST)
 export async function POST(req: NextRequest) {
@@ -38,19 +37,39 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.log('Creating blog with data:', {
+    console.log('Creating blog with data (pre-upload):', {
       title: title.trim(),
-      desc: desc.trim(),
-      image: image || '',
+      hasImage: Boolean(image),
       categoryId: categoryId.trim(),
-      paragraphs: paragraphs || null,
+      hasParagraphs: Boolean(paragraphs),
     });
+
+    let imageUrl: string = '';
+    if (image && typeof image === 'string') {
+      try {
+        // Base64 data URL ise ayıkla
+        const match = image.match(/^data:(.*?);base64,(.*)$/);
+        const base64Data = match ? match[2] : image;
+        const buffer = Buffer.from(base64Data, 'base64');
+        const contentType = match ? match[1] : 'image/png';
+        const fileName = `blog/${Date.now()}-${Math.random().toString(36).slice(2)}.png`;
+
+        const { url } = await put(fileName, buffer, {
+          access: 'public',
+          contentType,
+        });
+        imageUrl = url;
+      } catch (uploadErr) {
+        console.error('Blob upload failed:', uploadErr);
+        return NextResponse.json({ error: 'Görsel yüklenemedi' }, { status: 500 });
+      }
+    }
 
     const blog = await prisma.blog.create({
       data: {
         title: title.trim(),
         desc: desc.trim(),
-        image: image || '',
+        image: imageUrl,
         categoryId: categoryId.trim(),
         paragraphs: paragraphs || null,
       },
@@ -73,7 +92,8 @@ export async function POST(req: NextRequest) {
       { status: 500 }
     );
   } finally {
-    await prisma.$disconnect();
+    // Prisma singleton üzerinde disconnect çağırmayın; Vercel ortamında bağlantıyı yeniden
+    // kurmak maliyetli olabilir. Bağlantı havuzu prisma tarafından yönetilir.
   }
 }
 
@@ -103,12 +123,28 @@ export async function PUT(req: NextRequest) {
     
     console.log('Updating blog with ID:', id);
     
+    let imageUrl: string | undefined = undefined;
+    if (typeof image === 'string' && image.startsWith('data:')) {
+      try {
+        const match = image.match(/^data:(.*?);base64,(.*)$/);
+        const base64Data = match ? match[2] : image;
+        const buffer = Buffer.from(base64Data, 'base64');
+        const contentType = match ? match[1] : 'image/png';
+        const fileName = `blog/${id}-${Date.now()}.png`;
+        const { url } = await put(fileName, buffer, { access: 'public', contentType });
+        imageUrl = url;
+      } catch (uploadErr) {
+        console.error('Blob upload failed (update):', uploadErr);
+        return NextResponse.json({ error: 'Görsel yüklenemedi' }, { status: 500 });
+      }
+    }
+
     const updated = await prisma.blog.update({
       where: { id },
       data: {
         title: title.trim(),
         desc: desc.trim(),
-        image: image || '',
+        ...(imageUrl !== undefined ? { image: imageUrl } : {}),
         categoryId: categoryId.trim(),
         paragraphs: paragraphs || null,
       },
@@ -130,7 +166,6 @@ export async function PUT(req: NextRequest) {
       { status: 500 }
     );
   } finally {
-    await prisma.$disconnect();
   }
 }
 
@@ -156,7 +191,6 @@ export async function DELETE(req: NextRequest) {
       { status: 500 }
     );
   } finally {
-    await prisma.$disconnect();
   }
 }
 
@@ -194,6 +228,5 @@ export async function GET(req: NextRequest) {
       { status: 500 }
     );
   } finally {
-    await prisma.$disconnect();
   }
 }

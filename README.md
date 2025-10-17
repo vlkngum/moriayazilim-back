@@ -34,3 +34,21 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Environment
+
+Set the following variables locally (`.env.local`) and on Vercel (Project Settings → Environment Variables):
+
+```
+DATABASE_URL="postgres://<user>:<password>@db.prisma.io:5432/postgres?sslmode=require"
+```
+
+After setting, run:
+
+```bash
+npm run build && npm start
+```
+
+## Images / Uploads
+
+This app uses `@vercel/blob` to store images. Client sends base64, API uploads to Blob and stores only the URL in Postgres. Public buckets work without extra tokens; for private, set `BLOB_READ_WRITE_TOKEN` in Vercel.

@@ -1,17 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
 
 export async function POST(req: NextRequest) {
   try {
-    // Dinamik import ile PrismaClient'ı yükle
-    const { PrismaClient } = await import('@prisma/client');
-    const prisma = new PrismaClient();
 
     const body = await req.json();
     const { name } = body;
     
     // Input validation
     if (!name || typeof name !== 'string' || !name.trim()) {
-      await prisma.$disconnect();
       return NextResponse.json(
         { error: 'Kategori adı zorunludur.' }, 
         { status: 400 }
@@ -31,8 +28,6 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      await prisma.$disconnect();
-
       return NextResponse.json({ 
         success: true, 
         category: {
@@ -42,8 +37,6 @@ export async function POST(req: NextRequest) {
       }, { status: 201 });
 
     } catch (dbError: unknown) {
-      await prisma.$disconnect();
-      
       // Unique constraint error (eğer name unique ise)
       if (typeof dbError === 'object' && dbError !== null && 'code' in dbError && (dbError as { code?: string }).code === 'P2002') {
         return NextResponse.json(
@@ -73,9 +66,6 @@ export async function POST(req: NextRequest) {
 // GET endpoint - kategorileri listele
 export async function GET() {
   try {
-    const { PrismaClient } = await import('@prisma/client');
-    const prisma = new PrismaClient();
-
     const categories = await prisma.category.findMany({
       select: {
         id: true,
@@ -86,8 +76,6 @@ export async function GET() {
         createdAt: 'desc'
       }
     });
-
-    await prisma.$disconnect();
 
     return NextResponse.json({ 
       success: true, 
@@ -116,9 +104,6 @@ export async function DELETE(req: NextRequest) {
       );
     }
 
-    const { PrismaClient } = await import('@prisma/client');
-    const prisma = new PrismaClient();
-
     try {
       // Check if category exists
       const existingCategory = await prisma.category.findUnique({
@@ -126,7 +111,6 @@ export async function DELETE(req: NextRequest) {
       });
 
       if (!existingCategory) {
-        await prisma.$disconnect();
         return NextResponse.json(
           { error: 'Kategori bulunamadı.' },
           { status: 404 }
@@ -138,16 +122,12 @@ export async function DELETE(req: NextRequest) {
         where: { id }
       });
 
-      await prisma.$disconnect();
-
       return NextResponse.json({ 
         success: true,
         message: 'Kategori başarıyla silindi.'
       });
 
     } catch (dbError: unknown) {
-      await prisma.$disconnect();
-      
       console.error('Database error:', dbError);
       return NextResponse.json(
         { error: 'Kategori silinirken bir hata oluştu.' },
